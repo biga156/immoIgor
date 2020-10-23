@@ -172,7 +172,7 @@ class HomeController extends AbstractController
             if ($this->isCsrfTokenValid('delete'.$immobilier->getId(), $request->request->get('_token'))) {
                 $entityManager = $this->getDoctrine()->getManager();
                 $entityManager->remove($immobilier);
-                $entityManager->flush();
+                $entityManager->flush();   
 
             }
         }
