@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Location;
+
 use App\Repository\CategorieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -30,13 +32,14 @@ class Categorie
     private $resume;
 
     /**
-     * @ORM\OneToMany(targetEntity=Immobilier::class, mappedBy="categorie", orphanRemoval=true)
+     * TODO: Relation avec locations
+     * @ORM\OneToMany(targetEntity=Location::class, mappedBy="categorie")
      */
-    private $immobiliers;
+    private $locations;
 
     public function __construct()
     {
-        $this->immobiliers = new ArrayCollection();
+        $this->locations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -69,33 +72,38 @@ class Categorie
     }
 
     /**
-     * @return Collection|Immobilier[]
+     * @return Collection|Location[]
      */
-    public function getImmobiliers(): Collection
+    public function getLocations(): Collection
     {
-        return $this->immobiliers;
+        return $this->locations;
     }
 
-    public function addImmobilier(Immobilier $immobilier): self
+    public function addLocation(Location $location): self
     {
-        if (!$this->immobiliers->contains($immobilier)) {
-            $this->immobiliers[] = $immobilier;
-            $immobilier->setCategorie($this);
+        if (!$this->locations->contains($location)) {
+            $this->locations[] = $location;
+            $location->setCategorie($this);
         }
 
         return $this;
     }
 
-    public function removeImmobilier(Immobilier $immobilier): self
+    public function removeLocation(Location $location): self
     {
-        if ($this->immobiliers->contains($immobilier)) {
-            $this->immobiliers->removeElement($immobilier);
+        if ($this->locations->contains($location)) {
+            $this->locations->removeElement($location);
             // set the owning side to null (unless already changed)
-            if ($immobilier->getCategorie() === $this) {
-                $immobilier->setCategorie(null);
+            if ($location->getCategorie() === $this) {
+                $location->setCategorie(null);
             }
         }
 
         return $this;
+    }
+
+    public function __toString(){
+
+        return$this->titre;
     }
 }

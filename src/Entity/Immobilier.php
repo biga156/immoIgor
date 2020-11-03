@@ -41,12 +41,6 @@ class Immobilier
      */
     private $createdAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Categorie::class, inversedBy="immobiliers")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $categorie;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -96,18 +90,6 @@ class Immobilier
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    public function getCategorie(): ?Categorie
-    {
-        return $this->categorie;
-    }
-
-    public function setCategorie(?Categorie $categorie): self
-    {
-        $this->categorie = $categorie;
-
         return $this;
     }
 }

@@ -1,20 +1,37 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello LocationController!{% endblock %}
+{% block denomination %}Guinot-immobilier{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+  {{ include('_header_footers/header_location.html.twig') }}
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="container">
+          <div class="row" >
+               {%for location in locations | slice(0,length=40) %}
+                    <div class="col-3">
+                         <div class="card">
+                               <img src=" {{ location.photo }} " alt="" width="250">
+                               Publié le: {{location.createdAt | date('d/m/Y') }}
+                              <br>{{location.categorie.titre}}
+                               <ul>
+                                   <br>Adresse: {{location.id}} | {{location.ville}} |
+                                   <br>Surface : {{ location.surface}} M2
+                                   <br>Type : {{ location.type}}
+                                   <br>Prix : {{ location.prix}} € / mois 
+                                   <br>
+                                   <a href="{{ path('location.affich', {'id': location.id}) }}"><button type="button" class="btn btn-info">Consultez </a>
+                               </ul>
+                         </div>
+                    </div>
+               {% endfor%}
+          
+          </div>
+     
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/wamp64/www/symfony/classrooms/2021/guinot-immobilier/src/Controller/LocationController.php'|file_link(0) }}">src/Controller/LocationController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/wamp64/www/symfony/classrooms/2021/guinot-immobilier/templates/location/index.html.twig'|file_link(0) }}">templates/location/index.html.twig</a></code></li>
-    </ul>
+ <div class="pagination">
+        {{ knp_pagination_render(locations) }}
 </div>
+
+</div>
+
 {% endblock %}
