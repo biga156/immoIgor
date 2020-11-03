@@ -23,7 +23,7 @@ class HomeController extends AbstractController
     }
     
     /**
-     * Affichage de la Page UNE du Site
+     *TODO:  Affichage de la Page UNE du Site
      * @param LocationRepository $locationRepository, 
      * @param Request $reques
      * @Route("/", name="index")
@@ -44,7 +44,7 @@ class HomeController extends AbstractController
 
 
     /**
-     * Affichage de la Page A propos
+     * TODO: Affichage de la Page A propos
      * @param LocationRepository $locationRepository, 
      * @param Request $reques
      * @Route("/about", name="about.index")

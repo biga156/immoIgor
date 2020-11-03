@@ -54,7 +54,7 @@ class LocationController extends AbstractController
     }
 
     /**
-     * Affichage aux users de Biens en location
+     * TODO: Affichage aux users de Biens en location
      * Affichage pour les visiteurs // Different de l'affichage pour les Admins
      * @param LocationRepository $locarepo,
      * @param PaginatorInterface $paginator,
