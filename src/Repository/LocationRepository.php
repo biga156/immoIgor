@@ -29,7 +29,32 @@ class LocationRepository extends ServiceEntityRepository
             return $this->findBy([], ['createdAt' => 'DESC']);
         }
     
-        
+    public function getPaginetedPage(int $page, int $length)
+    {
+        $queryBuilder = $this->createQueryBuilder("p")
+                            ->orderBy("p.createdAt", "desc" )
+                            ->setFirstResult($page - 1) //Position du Page X 5
+                            ->setMaxResults($length)
+                        ;
+            return $queryBuilder->getQuery()->getResult();
+    }
+
+
+    /**
+     * @return Location[] Returns an array of Location objects
+     */
+    public function findLastLocation(int $nb=5)
+    {
+        return $this->createQueryBuilder('n')
+            ->andWhere('n.status = :status')
+            ->setParameter('status', 'PUBLISH')
+            ->orderBy('createdAt', 'DESC')
+            ->setMaxResults(nb)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
         
     /**
     * Requetespour les Recherches des Terrains
@@ -114,6 +139,27 @@ class LocationRepository extends ServiceEntityRepository
             return $qb->getQuery()->getResult();
         }
 
+
+     /**
+      * @return Location[] Returns an array of Location objects
+      */
+
+    public function getLocationByPrixInterval($prixMin, $prixMax)
+    {
+        $query = $this->createQueryBuilder('p')
+                        ->where('p.prix <= :prixmax')
+                        ->andWhere('p.prix >= :prixmin')
+                        ->setParameter(
+                                array('prixmin'=> $prixMin,
+                                      'prixmax'=> $prixMax
+                                      )
+                                    )
+                        ->orderBy('p.id', 'ASC')
+                        ->setMaxResults(10)
+
+                        ->getQuery();
+        return $query->getResult();
+    }
 
     /** 
      * 

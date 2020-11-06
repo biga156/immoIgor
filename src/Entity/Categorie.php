@@ -3,14 +3,16 @@
 namespace App\Entity;
 
 use App\Entity\Location;
-
-use App\Repository\CategorieRepository;
+use App\Repository\CategorieRepositorie;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+
+
 use Doctrine\ORM\Mapping as ORM;
 
+
 /**
- * @ORM\Entity(repositoryClass=CategorieRepository::class)
+ * @ORM\Entity(repositoryClass="App\Repository\CategorieRepository")
  */
 class Categorie
 {
@@ -32,7 +34,6 @@ class Categorie
     private $resume;
 
     /**
-     * TODO: Relation avec locations
      * @ORM\OneToMany(targetEntity=Location::class, mappedBy="categorie")
      */
     private $locations;
