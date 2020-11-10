@@ -10,7 +10,7 @@
                 <a class="nav-link" href="{{ path('admin.index')}}">Accueil <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#"> Système</a>
+                <a class="nav-link" href="{{ path('admin.index')}}"> Système</a>
             </li>
 
             <li class="nav-item dropdown">
@@ -18,7 +18,7 @@
                 <div class="dropdown-menu">
                 <a class="dropdown-item" href="{{path('location.index')}}">Groupe</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Separated link</a>
+                <a class="dropdown-item" href="#">Utilisateurs</a>
                 </div>
             </li>
 
@@ -26,8 +26,8 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="{{path('location.index')}}" role="button" aria-haspopup="true" aria-expanded="false">Contenu</a>
                 <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">Catégorie </a>
-                <a class="dropdown-item" href="#">Locations</a>
+                <a class="dropdown-item" href="{{path('categorie_index')}}">Catégorie  </a>
+                <a class="dropdown-item" href="{{path('location_admin.index')}}">Locations</a>
                 <a class="dropdown-item" href="#">Achats & Ventes </a>
                 <a class="dropdown-item" href="#">Articles à la UNE</a>
                 <a class="dropdown-item" href="#">Images</a>
@@ -40,7 +40,7 @@
                 <a class="nav-link" href="#"> Composantes</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#"> Deconnexion</a>
+                <a class="nav-link" href="{{ path('index')}}"> Deconnexion</a>
             </li>
             
             </ul>

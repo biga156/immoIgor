@@ -4,9 +4,11 @@ namespace App\Repository;
 
 use App\Entity\Location;
 use App\Entity\Categorie;
+
+use App\Data\SearchData;
+
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\Query\AST\Join;
 
 /**
  * @method Location|null find($id, $lockMode = null, $lockVersion = null)
@@ -24,149 +26,192 @@ class LocationRepository extends ServiceEntityRepository
     /**
      * @return Location[] Returns an array of Location objects
      */
-        public function findLastArticles()
-        {
-            return $this->findBy([], ['createdAt' => 'DESC']);
-        }
-    
-    public function getPaginetedPage(int $page, int $length)
+    public function findLastArticles()
     {
-        $queryBuilder = $this->createQueryBuilder("p")
-                            ->orderBy("p.createdAt", "desc" )
-                            ->setFirstResult($page - 1) //Position du Page X 5
-                            ->setMaxResults($length)
-                        ;
-            return $queryBuilder->getQuery()->getResult();
+        return $this->findBy([], ['createdAt' => 'DESC']);
     }
 
+    /**
+     * Recherche de Locations
+     * @param
+     * @param
+     * @return Location[]
+     *
+     */
+    public function findSearch()
+    {
+        return $this->findAll();
+    }
+
+    public function getPaginetedPage(int $page, int $length)
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->orderBy('p.createdAt', 'desc')
+            ->setFirstResult($page - 1) //Position du Page X 5
+            ->setMaxResults($length);
+        return $queryBuilder->getQuery()->getResult();
+    }
 
     /**
      * @return Location[] Returns an array of Location objects
      */
-    public function findLastLocation(int $nb=5)
+    public function findLastLocation(int $nb = 5)
     {
         return $this->createQueryBuilder('n')
             ->andWhere('n.status = :status')
             ->setParameter('status', 'PUBLISH')
             ->orderBy('createdAt', 'DESC')
-            ->setMaxResults(nb)
+            ->setMaxResults($nb)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 
-        
     /**
-    * Requetespour les Recherches des Terrains
-    * @param 
-    * @method findByCatTerrains()
-    * 
-    */
-        public function findByCatTerrains()
-        {
-            $qb = $this->createQueryBuilder('p');      
-            $qb
-                ->innerJoin('App\Entity\Categorie',  'c', 'WITH', 'c = p.categorie')
-                ->where('p.createdAt IS NOT NULL')
-                ->andWhere('c.titre like :titre')
-                ->setParameter('titre', 'Terrains');
-               
-                dump($qb->getQuery()->getResult());
-
-            return $qb->getQuery()->getResult();
-        }
-        
-        /**
-         * Requetespour les Recherches des Appartements
-         * @param 
-         * @method
-         * 
-         */
-        public function findByCatHostels()
-        {
-            $qb = $this->createQueryBuilder('p');
-            $qb
-                ->innerJoin('App\Entity\Categorie',  'c', 'WITH', 'c = p.categorie')
-                ->where(
-                    $qb->expr()->IsNotNull('p.createdAt'),
-                    $qb->expr()->like('c.titre like :titre')
-                )
-                ->setParameter('titre', 'Hostels'); 
-               // dump($qb->getQuery()->getResult());
-
-            return $qb->getQuery()->getResult();
-        }
-
-
-
-        /**
-         * Requetespour les Recherches des Appartements
-         * @param 
-         * @method
-         *          * 
-         */
-        public function findByCatAppartements()
-        {
-            $qb = $this->createQueryBuilder('p');
-            
-            $qb
-                ->innerJoin('App\Entity\Categorie',  'c', 'WITH', 'c = p.categorie')
-                ->where('p.createdAt IS NOT NULL')
-                ->andWhere('c.titre like :titre')
-                ->setParameter('titre', 'Appartements'); 
-               // dump($qb->getQuery()->getResult());
-
-            return $qb->getQuery()->getResult();
-        }
-
-        /**
-         * Requetespour les Recherches des Appartements
-         * @param 
-         * @method
-         * 
-         */
-        public function findByCatMaisons()
-        {
-            $qb = $this->createQueryBuilder('p');
-            
-            $qb
-                ->innerJoin('App\Entity\Categorie',  'c', 'WITH', 'c = p.categorie')
-                ->where('p.createdAt IS NOT NULL')
-                ->andWhere('c.titre like :titre')
-                ->setParameter('titre', 'Maisons'); 
-               // dump($qb->getQuery()->getResult());
-
-            return $qb->getQuery()->getResult();
-        }
-
-
-     /**
-      * @return Location[] Returns an array of Location objects
-      */
-
-    public function getLocationByPrixInterval($prixMin, $prixMax)
+     * Recupère un produit en lien avec un bien
+     * @return Location[]
+     *
+     */
+    public function findLocaRech(SearchData $search): array
     {
         $query = $this->createQueryBuilder('p')
-                        ->where('p.prix <= :prixmax')
-                        ->andWhere('p.prix >= :prixmin')
-                        ->setParameter(
-                                array('prixmin'=> $prixMin,
-                                      'prixmax'=> $prixMax
-                                      )
-                                    )
-                        ->orderBy('p.id', 'ASC')
-                        ->setMaxResults(10)
+            ->select('c', 'p')
+            ->join('p.categorie', 'c');
 
-                        ->getQuery();
-        return $query->getResult();
+        if (!empty($search->categories)) {
+            $query = $query
+                ->andWhere('c.id IN (:categories)')
+                ->setParameter('categories', $search->categories);
+        }
+
+        if (!empty($search->min)) {
+            $query = $query
+                ->andWhere('p.prix >= :min')
+                ->setParameter('min', $search->min);
+        }
+
+        if (!empty($search->max)) {
+            $query = $query
+                ->andWhere('p.prix <= :max')
+                ->setParameter('max', $search->max);
+        }
+
+        return $query->getQuery()->getResult();
     }
 
-    /** 
-     * 
-     * 
-    */
+    /**
+     * Requetespour les Recherches des Terrains
+     * @param
+     * @method findByCatTerrains()
+     *
+     */
+    public function findByCatTerrains()
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->innerJoin('App\Entity\Categorie', 'c', 'WITH', 'c = p.categorie')
+            ->where('p.createdAt IS NOT NULL')
+            ->andWhere('c.titre like :titre')
+            ->setParameter('titre', 'Terrains');
 
-/*        public function getLocation($categorie_id = null, $max = null)
+        dump($qb->getQuery()->getResult());
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findByCatTerrains02()
+    { 
+        $qb = $this->createQueryBuilder('location');
+        $qb
+            ->innerJoin('App\Entity\Categorie', 'categorie', 'WITH', 'categorie = location.categorie')
+           ->where('location.categorie=categorie.id')
+            ->andWhere('categorie.titre like :titre')
+            ->setParameter('titre', 'Terrains');
+
+        dump($qb->getQuery()->getResult());
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Requetes pour les Recherches des Appartements
+     * @param
+     * @method
+     *
+     */
+    public function findByCatHostels()
+    { $qb = $this->createQueryBuilder('location');
+        $qb
+            ->innerJoin('App\Entity\Categorie', 'categorie', 'WITH', 'categorie = location.categorie')
+           ->where('location.categorie=categorie.id')
+            ->andWhere('categorie.titre like :titre')
+            ->setParameter('titre', 'Hôtel');
+
+        dump($qb->getQuery()->getResult());
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Requetespour les Recherches des Appartements
+     * @param
+     * @method
+     *          *
+     */
+    public function findByCatAppartements()
+    { $qb = $this->createQueryBuilder('location');
+        $qb
+            ->innerJoin('App\Entity\Categorie', 'categorie', 'WITH', 'categorie = location.categorie')
+           ->where('location.categorie=categorie.id')
+            ->andWhere('categorie.titre like :titre')
+            ->setParameter('titre', 'Appartement');
+
+        dump($qb->getQuery()->getResult());
+
+        return $qb->getQuery()->getResult();
+    }
+    /**
+     * Requetespour les Recherches des Appartements
+     * @param
+     * @method
+     *
+     */
+    public function findByCatMaisons()
+    {
+        $qb = $this->createQueryBuilder('p');
+
+        $qb
+            ->innerJoin('App\Entity\Categorie', 'c', 'WITH', 'c = p.categorie')
+            ->where('p.createdAt IS NOT NULL')
+            ->andWhere('c.titre like :titre')
+            ->setParameter('titre', 'Maisons');
+        // dump($qb->getQuery()->getResult());
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Location[] Returns an array of Location objects
+     */
+
+ /*   public function getLocationByPrixInterval($prixMin, $prixMax)
+    {
+        $query = $this->createQueryBuilder('p')
+            ->where('p.prix <= :prixmax')
+            ->andWhere('p.prix >= :prixmin')
+            ->setParameter(['prixmin' => $prixMin, 'prixmax' => $prixMax])
+            ->orderBy('p.id', 'ASC')
+            ->setMaxResults(10)
+
+            ->getQuery();
+        return $query->getResult();
+    }*/
+
+    /**
+     *
+     *
+     */
+
+    /*        public function getLocation($categorie_id = null, $max = null)
         {
             $qb = $this->createQueryBuilder('e')
                 ->orderBy('e.location', 'DESC');
@@ -186,11 +231,6 @@ class LocationRepository extends ServiceEntityRepository
      
             return $query->getResult();
         }
-
-
-
-        
-
 
 
         public function findAllWithCategories()
@@ -232,8 +272,8 @@ class LocationRepository extends ServiceEntityRepository
             return $qb->execute();
         }
 */
-        
-        // /**
+
+    // /**
     //  * @return Location[] Returns an array of Location objects
     //  */
     /*
@@ -261,5 +301,4 @@ class LocationRepository extends ServiceEntityRepository
         ;
     }
     */
-
 }
